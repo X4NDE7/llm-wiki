@@ -1,13 +1,13 @@
-# /wiki - LLM Wiki
+# $wiki - LLM Wiki
 
-Persistent knowledge management powered by Claude Code. Maintains a structured wiki in Logseq or Obsidian using the L1/L2 cache architecture.
+Persistent knowledge management powered by Codex. Maintains a structured wiki in Logseq or Obsidian using the L1/L2 cache architecture.
 
 **Architecture: L1/L2 Cache Model**
-- L1 = Claude Memory (auto-loaded): Rules, gotchas, identity, credentials
+- L1 = applicable AGENTS.md instructions plus explicitly read, non-secret rule notes
 - L2 = Wiki (on-demand): Projects, workflows, research, deep knowledge
 
 **Two cache mechanisms keep L2 precise as it grows:**
-- **Hub-Index-Routing** — L1's auto-loaded memory index has no L2 counterpart by default. Each hub page
+- **Hub-Index-Routing** — L1's instruction context has no L2 counterpart by default. Each hub page
   carries an `### Index` of routing lines (one per child: `[[link]] -- description #tags`). `query`
   becomes two-stage: read the cheap hub indexes -> pick the 3 most relevant pages by description ->
   read only those full pages. This is the wiki's "page table / TLB" — no more grep-over-everything.
@@ -16,7 +16,7 @@ Persistent knowledge management powered by Claude Code. Maintains a structured w
   fallback, all `[[links]]` intact. Access-frequency eviction — the missing CPU-cache mechanism.
 
 **One mechanism keeps L1 honest:**
-- **L1-Verification** — access frequency cannot find stale L1 rules: every L1 file loads every session, so
+- **L1-Verification** — access frequency cannot certify the accuracy of startup instructions, so
   a stale rule never looks cold. It shows up as the agent confidently acting on an outdated assumption.
   L1 files therefore carry a claim class: `asserts-current-behavior: true` (a path, command, flag, version,
   quirk — can silently go stale) or `false` (a decision, preference, identity — never stale), plus
@@ -26,14 +26,14 @@ Persistent knowledge management powered by Claude Code. Maintains a structured w
 ## Arguments
 
 ```
-/wiki ingest <source>        Process source, create/update wiki pages
-/wiki query <question>       Search wiki (two-stage via hub index), synthesize answer
-/wiki prune [--months N]     LRU-Demote: evict cold pages from the live index (default 6 months)
-/wiki prune --l1 [--batch N] [--days N]
+$wiki ingest <source>        Process source, create/update wiki pages
+$wiki query <question>       Search wiki (two-stage via hub index), synthesize answer
+$wiki prune [--months N]     LRU-Demote: evict cold pages from the live index (default 6 months)
+$wiki prune --l1 [--batch N] [--days N]
                              L1-Verification: classify L1 rules, check due claims, re-verify/demote/delete
-/wiki lint [--fix]           Health check: orphans, stale, broken refs, index drift
-/wiki status                 Wiki metrics and health overview (incl. hot/cold profile)
-/wiki import                 Import existing notes into wiki format
+$wiki lint [--fix]           Health check: orphans, stale, broken refs, index drift
+$wiki status                 Wiki metrics and health overview (incl. hot/cold profile)
+$wiki import                 Import existing notes into wiki format
 ```
 
 ## Workflow
@@ -53,6 +53,11 @@ Read `llm-wiki.yml` from the wiki root directory FIRST to determine:
 - `l1_verify_days`: days until an L1 behavior claim is due for re-verification (optional, default 90;
   invalid value -> warn and use 90)
 - `namespaces`: configured top-level namespaces
+- `ingest`: optional settings from config.example.yml (default: mode jev, local .wiki-ingest artifacts,
+  jev-1.13.0, offline, 1000 HTTP attempts, yes 0.8/no 0.2/confidence 0.8)
+- Codex discovers the installed `.agents/skills/wiki/SKILL.md`; the config location is in its
+  `config-path.txt`. Read optional `memory_path/INDEX.md` (or legacy MEMORY.md) and relevant notes
+  explicitly. Codex does not automatically load arbitrary memory-directory files.
 
 ## Tool-Specific Format Rules
 
@@ -78,17 +83,23 @@ Read `llm-wiki.yml` from the wiki root directory FIRST to determine:
 - ISO 8601 dates (YYYY-MM-DD)
 
 ## L1/L2 Boundary
-- L1 (Memory, auto-loaded): Rules, gotchas, identity, credentials — things Claude must know EVERY session
-- L2 (Wiki, on-demand): Projects, workflows, research — queried via /wiki when needed
+- L1: AGENTS.md startup rules and optional non-secret rule notes read explicitly
+- L2 (Wiki, on-demand): Projects, workflows, research — queried via $wiki when needed
 - Routing rule: "Would a mistake without this knowledge be dangerous/embarrassing? -> L1. Merely inconvenient? -> L2."
-- Credentials MUST stay in L1 (wiki is git-tracked!)
+- Credential references may stay in L1; actual secrets belong in environment variables or a secret manager.
 </context>
 
 <workflow>
 ## Workflow: ingest (Default)
 
 Phase 1 - Source Analysis:
-  - Identify source type (URL -> WebFetch, file path -> Read, text -> parse directly)
+  - Identify source type (URL -> available web tools, file path -> local document tools, text -> parse)
+  - With ingest.mode jev, follow the installed skill's references/jev-ingestion.md
+    (docs/jev-ingestion.md in this repository). Prepare source-linked reading units with the helper.
+  - Codex reads all sections for open-ended discovery before choosing versioned semantic dimensions.
+    Save coverage, concepts, argument dependencies, candidate definitions, and figure needs.
+  - Annotate passages with Jev, preserving unknown results and original source spans.
+    Batch independent questions; stages whose inputs depend on prior answers run separately.
   - Extract: entities, facts, relationships, dates, decisions
   - Classify: business, technical, content, project, learning, reference
   - L1/L2 Check: Is this a quick rule/gotcha? -> Recommend Memory. Deep knowledge? -> Wiki
@@ -99,6 +110,12 @@ Phase 2 - Wiki Scan:
   - Check target pages: do they exist? (Glob for wiki pages)
   - Read existing target pages
   - Identify: pages to create, pages to update, cross-refs to add
+  - Generate internal reading tasks for definitions, premises, mechanisms, prerequisites,
+    qualifications, and comparisons. Assemble packets from relevant source indexes.
+  - For cross-book synthesis, compare operations, scope, outcomes, theoretical commitments, and
+    contradictions. Use candidate alignment/facet navigation where useful; never auto-merge concepts.
+  - Read packet evidence in context, including conflicts, uncertain candidates and figure references.
+    Expand the shortlist when coverage is insufficient; annotations must not hide unfamiliar ideas.
 
 Phase 3 - Page Operations (target: 5-15 page touches):
   - Create new pages with all required properties (per Schema)
@@ -109,6 +126,8 @@ Phase 3 - Page Operations (target: 5-15 page touches):
     key for query Phase 0 — keep it terse, distinctive, no filler ("Notes about ...").
   - Add [[cross-references]] between all affected pages
   - Set updated:: property (or YAML updated field) on all modified pages
+  - Cite source title, edition, page and block/span ID for source-backed claims and quotations.
+    Copy quotations from original_text, distinguish interpretation, and inspect figures before embedding.
 
 Phase 4 - Quality Gate:
   - All new pages have required properties (per Schema)?
@@ -116,10 +135,14 @@ Phase 4 - Quality Gate:
   - Every new/updated active page has a routing line in its hub `### Index`? (else it is unroutable)
   - No credentials in wiki content?
   - Count page touches (warn if < 5 or > 20)
+  - Verify exact quotations, source revisions, source/figure references, and unresolved evidence.
+    Jev distributions do not establish factual truth or article confidence.
 
 Phase 5 - Report:
   - Summary: pages created, pages updated, cross-refs added
   - List any warnings or skipped items
+  - Include live/offline status, reading coverage, unanswered tasks, conflicts, usage from run audits,
+    and proposed question revisions. Preserve artifacts for later checks.
 
 ## Workflow: query
 
@@ -143,7 +166,7 @@ Phase 1b - Access Logging (LRU signal + routing transparency):
   - **`matched:` reason = the "and why" of the routing** (loading transparency): on index routing
     (Phase 0) the hub `### Index` routing description / #tag that matched the question; on the L3 fallback
     the grep term that found the page. Keep it short (<= 60 chars), in quotes. The log then shows not just
-    WHICH page loaded but WHY it was picked for this question — surfaced via `/wiki status` cache profile.
+    WHICH page loaded but WHY it was picked for this question — surfaced via `$wiki status` cache profile.
   - Append-only, NO per-query git commit (non-structural — see Constraints)
   - If the L3 fallback hits an archived page (`archived::` set) — a re-hit on an evicted page: offer to
     re-promote it — move its routing line back into the hub `### Index`, drop the archived:: property
@@ -205,7 +228,7 @@ never touches L1. L1 is NOT git-tracked — there is no undo, so every write nee
 Phase 1 - Scope:
   - Read llm-wiki.yml first. No `memory_path` -> "memory_path not configured — L1 mode unavailable." and abort
   - Scan every L1 memory file EXCEPT the index file (e.g. MEMORY.md — an index, not a rule). Its lines are
-    auto-loaded too: keep them in step whenever a rule is corrected, demoted, or deleted
+    read explicitly: keep them in step whenever a rule is corrected, demoted, or deleted
   - Batch size 10 (`--batch N`); window = `l1_verify_days` (`--days N` overrides)
   - Read `asserts-current-behavior` and `verified` from the frontmatter top level OR a `metadata:` block
 
@@ -256,7 +279,7 @@ Phase 5 - Report + Commit:
   - Git commit for wiki pages changed by demotion (plus pending Access-Log appends). L1 is git-excluded —
     nothing to commit there
 
-Out of scope: warning at the moment a due rule is about to justify an action. Claude Code loads L1, not
+Out of scope: warning at the moment a due rule is about to justify an action. Codex loads L1, not
 llm-wiki — there is no hook to enforce that gate, so do not claim one.
 
 ## Workflow: lint
@@ -280,12 +303,15 @@ Phase 2 - Check Rules (from Schema):
   - Empty Pages: pages with only properties, no content
   - Cross-ref Minimum: pages with fewer than 1 outgoing [[link]]
   - L1/L2 Duplicates: same info in Memory AND Wiki -> warning
+  - Source Provenance: for source-backed claims, check title/edition/page/block references against
+    the recorded source revision. Quotes must match original extracted spans. Flag missing figures,
+    unresolved conflicts, missing context, and packets built from stale indexes.
   - L1 Verification Due (only if `memory_path` is set; skip the L1 index file):
     - warning per L1 file with `asserts-current-behavior: true` and `verified` missing or older than
       `l1_verify_days` — report file name, verified date (or "never"), age in days
     - info: ONE line with the count of unclassified L1 files (no `asserts-current-behavior` key)
     - `asserts-current-behavior: false` is never flagged, regardless of age
-    - never print L1 file bodies (L1 may hold credentials); suggest `/wiki prune --l1`
+    - never print L1 file bodies (L1 may hold credentials); suggest `$wiki prune --l1`
 
 Phase 3 - Report:
   - Group findings by severity (critical, warning, info)
@@ -321,6 +347,9 @@ Phase 1 - Metrics:
 Phase 2 - Health:
   - Lightweight lint (no file modifications)
   - Report: orphans, stale pages, broken refs, index drift
+  - Ingestion coverage: report prepared/annotated sources, discovery coverage, unanswered reading
+    tasks and uncertain packets from the configured artifact directory. Distinguish offline runs
+    from live Jev evaluations; aggregate usage only from reported run-audit values.
 
 Phase 2b - Cache Profile (from the Access-Log page):
   - Hot pages: most-queried pages (last 30 days) — top 5

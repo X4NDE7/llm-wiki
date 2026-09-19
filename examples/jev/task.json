@@ -1,0 +1,7 @@
+{
+  "id": "attention-definition-and-control",
+  "question": "How do the accounts define attention, and do they require voluntary control?",
+  "premise": "All accounts require voluntary control.",
+  "candidate_ids": [],
+  "dimension_filters": {"voluntary_control": "yes"}
+}

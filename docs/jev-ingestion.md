@@ -8,6 +8,44 @@ This is an extension of the existing command-driven wiki, not a separate writing
 agent. L1/L2 routing, Logseq/Obsidian formatting, and append-only article updates
 still apply. Source artifacts live outside the article namespace in `.wiki-ingest/`.
 
+## Run it with Codex
+
+Setup installs `$wiki` in `.agents/skills/wiki/SKILL.md`, including the helper and
+this reference. Codex reads `llm-wiki.yml` and passes its settings as CLI arguments.
+With `ingest.mode: llm`, short-note ingestion follows the ordinary workflow.
+With `ingest.mode: jev`, the default is offline. To enable live evaluation, put
+`TYPESAFE_API_KEY` in the environment and set `ingest.jev.live: true`. If the key
+is unavailable, Codex reports that Jev judgments are pending and uses offline mode.
+
+From this repository (or the root of the installed skill bundle), run this
+synthetic example without a key:
+
+```bash
+python3 scripts/wiki-ingest.py prepare examples/jev/source.json --output .wiki-ingest/indexes/demo-prepared.json
+python3 scripts/wiki-ingest.py annotate --index .wiki-ingest/indexes/demo-prepared.json --dimensions examples/jev/dimensions.json --output .wiki-ingest/indexes/demo-v1.json
+python3 scripts/wiki-ingest.py packet --index .wiki-ingest/indexes/demo-v1.json --task examples/jev/task.json --output .wiki-ingest/packets/attention-v1.json
+python3 scripts/wiki-ingest.py navigate --state examples/jev/task.json --facets examples/jev/facets.json --output .wiki-ingest/navigation/attention-v1.json
+```
+
+The example source is invented to demonstrate the pipeline. It is not book
+evidence or an accuracy benchmark. Add `--live` for live requests and use new
+output filenames. Every command also writes `OUTPUT.run.json`, unless `--audit`
+specifies another unused path. Outputs are never silently overwritten.
+
+`prepare` also accepts text/Markdown with `--source-id`, `--title`, and `--edition`.
+`packet` accepts multiple `--index` arguments for cross-source work and `--limit`
+(default 30) for the lexical shortlist. Explicit IDs and dimension matches can
+expand that shortlist. `align` takes multiple indexes and a `--pair` JSON file:
+`{"kind":"concept","left":["actual block ID"],"right":["actual block ID"]}`.
+Codex copies the actual IDs from the indexes. `navigate` takes `--width` and
+`--depth` for bounded exploration of the supplied facet tree.
+
+All commands accept `--model`, `--max-requests`, `--yes`, `--no`, and `--confidence`.
+Codex forwards the corresponding `ingest.jev` values. A `--replay` audit reuses only
+validated responses whose request hash matches the exact evidence, model and
+questions. Missing matches remain pending; replay does not make network requests.
+The helper deliberately does not invent LLM discoveries or write articles.
+
 ## Pipeline and responsibilities
 
 1. **Extract.** The host agent extracts PDF/OCR text, page labels, reading order,

@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — Codex + Jev adaptation
+
+- Install a self-contained Codex skill under `.agents/skills/wiki` with `$wiki`
+  invocation, bundled references/helper/examples and a project AGENTS.md locator.
+- Correct L1 loading guidance: AGENTS.md startup rules plus explicitly read optional
+  notes; credentials stay in the environment or a secret manager.
+- Add source-linked Jev preparation, versioned semantic annotation, BM25 shortlisting,
+  reranking, exact-span selection, evidence packets, alignment and facet navigation.
+- Preserve conflicts, uncertainty, source revisions, raw distributions and request
+  audits. Default to offline operation; live Jev requires an environment API key.
+- Integrate the new stages with ingestion, provenance checks, status, templates and
+  specifications while preserving upstream v1.4.0 hub routing and L1 verification.
+- Test software contracts and both wiki installers using the Python standard library.
+  Live Jev accuracy on books remains to be evaluated.
+
 All notable changes to this project will be documented in this file.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).

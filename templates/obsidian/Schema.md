@@ -86,14 +86,15 @@ namespace: Wiki/NamespaceName
 
 ## L1/L2 Architecture
 
-### L1 = Claude Memory (auto-loaded every session)
+### L1 = Codex startup instructions and explicitly read rule notes
 
 - Feedback rules and quick gotchas
 - User identity (name, preferences)
-- Credentials (MUST NEVER go into the wiki)
-- Everything Claude needs to know at the START of every session
+- Credential references only; secret values belong in environment variables or a secret manager
+- Codex loads applicable AGENTS.md instructions; optional memory_path files are read explicitly
+- Everything Codex needs to know at the START of every session
 
-### L2 = Wiki (on-demand via `/wiki query`)
+### L2 = Wiki (on-demand via `$wiki query`)
 
 - Projects and their details
 - Workflows and processes
@@ -103,9 +104,9 @@ namespace: Wiki/NamespaceName
 
 ### Boundary Rules
 
-- New quick rule or gotcha discovered? --> Save to Claude Memory (L1)
+- New quick rule or gotcha discovered? --> Save to Codex instructions (L1)
 - New project, workflow, or research? --> Save to Wiki (L2)
-- Same info in L1 AND L2? --> Warning on `/wiki lint`
+- Same info in L1 AND L2? --> Warning on `$wiki lint`
 - L1 rule claims current behavior (path, flag, version, quirk)? --> `asserts-current-behavior: true` + `verified: <date>` in its frontmatter
 - L1 rule records a decision or preference? --> `asserts-current-behavior: false` (never stale)
 
@@ -122,6 +123,11 @@ namespace: Wiki/NamespaceName
 
 ## Lint Rules
 
+- **Source Provenance**: Source-backed claims cite title, edition, page and block/span ID
+- **Exact Quotations**: Quoted text matches the original extracted span, not reconstructed reading text
+- **Evidence Coverage**: Conflicts, uncertain candidates, missing figures and unanswered tasks are recorded
+- Jev annotations organize evidence; they do not set article confidence or authorize page merges
+
 - **Orphan Detection**: Pages with 0 incoming [[links]] (hub pages excluded)
 - **Stale Detection**: `updated` > 90 days old AND `confidence: high`
 - **Missing Properties**: Pages missing type-specific required properties
@@ -131,7 +137,7 @@ namespace: Wiki/NamespaceName
 - **Empty Pages**: Only properties, no content
 - **Cross-Ref Minimum**: Pages with fewer than 1 outgoing [[link]]
 - **L1/L2 Duplicates**: Same info in Memory AND Wiki
-- **L1 Verification Due**: L1 behavior claims never verified or older than `l1_verify_days` (default 90) --> `/wiki prune --l1`
+- **L1 Verification Due**: L1 behavior claims never verified or older than `l1_verify_days` (default 90) --> `$wiki prune --l1`
 
 ## Conventions
 

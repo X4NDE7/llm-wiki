@@ -5,7 +5,7 @@ Thanks for your interest in contributing! This project is young and contribution
 ## Ways to contribute
 
 - **Bug reports** — Something broken in `setup.sh`? Wiki pages not formatting correctly? Open an issue.
-- **Feature requests** — Ideas for new `/wiki` commands, lint rules, or template improvements? Open an issue.
+- **Feature requests** — Ideas for new `$wiki` commands, lint rules, or template improvements? Open an issue.
 - **Templates** — Better Schema designs, new page types, or improved hub pages.
 - **Tool support** — Improvements to Logseq or Obsidian templates, or support for new tools.
 - **Documentation** — Fixes, clarifications, or new guides.
@@ -21,6 +21,17 @@ Thanks for your interest in contributing! This project is young and contribution
 7. Open a Pull Request
 
 ## Testing your changes
+
+Run the standard-library tests first:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The setup test installs into temporary Logseq and Obsidian wikis, preserves existing
+pages and AGENTS.md guidance, and runs the copied Jev helper from outside this
+checkout. Ingestion tests use explicitly synthetic responses; they do not establish
+live Jev accuracy. No external test framework or API key is required.
 
 Before submitting a PR, test both modes:
 
@@ -55,7 +66,7 @@ Format: `type: short description`
 
 Types: `feat`, `fix`, `docs`, `templates`, `examples`
 
-Example: `feat: add /wiki export command for PDF generation`
+Example: `feat: add $wiki export command for PDF generation`
 
 ## Questions?
 

@@ -1,7 +1,15 @@
-graph LR
-    SRC[Source<br/>URL / File / Text] --> A[Phase 1<br/>Analyze & Extract]
-    A --> B[Phase 2<br/>Scan Wiki<br/>Find affected pages]
-    B --> C[Phase 3<br/>Update 5-15 Pages<br/>Create new / Append]
-    C --> D[Phase 4<br/>Quality Gate<br/>Properties? Cross-refs?<br/>No credentials?]
-    D --> E[Phase 5<br/>Report<br/>Pages touched / Warnings]
-    E --> GIT[git commit]
+flowchart TD
+    SRC[Books / URLs / text] --> EX[Extract text, page locations and figures]
+    EX --> PREP[Code + Jev: structural recovery]
+    PREP --> READ[Codex: source reading and concept discovery]
+    READ --> DIM[Codex: dimensions and internal reading tasks]
+    DIM --> ANN[Jev: source passage annotations]
+    ANN --> IDX[Persistent source-linked index]
+    IDX --> V[Vertical evidence: argument dependencies]
+    IDX --> H[Horizontal evidence: comparisons and conflicts]
+    V --> PACK[Code + Jev: exact-span evidence packets]
+    H --> PACK
+    PACK --> WRITE[Codex: illustrated articles and hub links]
+    WRITE --> CHECK[Provenance, quality checks and revision feedback]
+    CHECK --> DIM
+    CHECK --> GIT[Authorized commit and push]

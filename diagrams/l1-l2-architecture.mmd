@@ -1,16 +1,16 @@
 graph TB
-    subgraph "Every Session (Auto-loaded)"
-        L1[L1: Claude Memory<br/>~14 files]
+    subgraph "Startup instructions and explicitly read notes"
+        L1[L1: AGENTS.md + optional rule notes]
         L1R[Rules & Gotchas]
         L1I[Identity & Preferences]
-        L1C[Credentials]
+        L1C[Credential references]
         L1 --> L1R
         L1 --> L1I
         L1 --> L1C
     end
 
-    subgraph "On Demand (/wiki query)"
-        L2[L2: Logseq Wiki<br/>~46 pages]
+    subgraph "On Demand ($wiki query)"
+        L2[L2: Logseq / Obsidian Wiki]
         L2P[Projects & History]
         L2W[Workflows & Processes]
         L2K[Research & Learning]
@@ -23,6 +23,6 @@ graph TB
     ROUTE -->|Yes| L1
     ROUTE -->|No| L2
 
-    USER[User Query] --> CLAUDE[Claude Code]
-    CLAUDE --> L1
-    CLAUDE -->|Deep question| L2
+    USER[User Query] --> CODEX[Codex]
+    CODEX --> L1
+    CODEX -->|Deep question| L2

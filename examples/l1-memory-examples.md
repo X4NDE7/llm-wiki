@@ -1,7 +1,7 @@
 # L1 Memory Rule Examples
 
-These are examples of rules that belong in **L1 (Claude Memory)** -- the auto-loaded
-context that Claude reads at the start of every session. L1 rules are quick, actionable,
+These are examples of rules that belong in **L1 (Codex instructions)**. Essential rules
+go in AGENTS.md; optional note files are read explicitly. L1 rules are quick, actionable,
 and universally relevant. Deep knowledge lives in L2 (the wiki).
 
 ---
@@ -83,6 +83,6 @@ and universally relevant. Deep knowledge lives in L2 (the wiki).
 
 ## Why L1?
 
-These rules are L1 because they apply **across sessions** and Claude needs them
+These rules are L1 because they apply **across sessions** and Codex needs them
 **immediately** -- not after a wiki query. Compare with L2 content like "how does our
 CI pipeline work end-to-end" which is detailed knowledge retrieved on demand.

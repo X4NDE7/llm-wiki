@@ -2,7 +2,7 @@
 tool: logseq          # logseq or obsidian
 wiki_path: ~/Documents/MyWiki/
 pages_dir: pages      # relative to wiki_path
-memory_path: ~/.claude/projects/my-project/memory/
+memory_path: ~/.codex/wiki-memory/my-project/ # optional non-secret notes; explicitly read
 l1_verify_days: 90    # optional: re-verify L1 behavior claims after N days
 namespaces:
   - Business
@@ -12,3 +12,13 @@ namespaces:
   - People
   - Learning
   - Reference
+ingest:
+  mode: jev          # jev or llm (simple notes)
+  artifact_dir: .wiki-ingest # local source/index/packet artifacts; excluded from git
+  jev:
+    model: jev-1.13.0
+    live: false      # set true with TYPESAFE_API_KEY in the environment
+    max_requests: 1000 # maximum HTTP attempts per helper command
+    "yes": 0.8       # provisional Noul yes threshold
+    "no": 0.2        # provisional Noul no threshold
+    confidence: 0.8 # provisional Choice/Score labeling threshold

@@ -1,0 +1,29 @@
+{
+  "source_id": "synthetic-attention",
+  "title": "Synthetic attention notes (pipeline example, not scholarly evidence)",
+  "edition": "demo-v1",
+  "uri": "examples/jev/source.json",
+  "pages": [
+    {
+      "page": 1,
+      "lines": [
+        {"text": "# Deliberate attention", "kind": "heading"},
+        {"text": "In these invented notes, deliberate attention means selecting", "region": "body", "bbox": [40, 70, 400, 85]},
+        {"text": "a target voluntarily while other signals remain available.", "region": "body", "bbox": [40, 86, 400, 101]},
+        {"text": ""},
+        {"text": "The exercise requires the learner to notice a target first.", "kind": "paragraph"},
+        {"text": "Practice: choose one sound and return to it after a distraction.", "kind": "list_item"},
+        {"text": "This description concerns subjective reports, not measured performance.", "kind": "paragraph"}
+      ]
+    },
+    {
+      "page": 2,
+      "lines": [
+        {"text": "# A different use of the term", "kind": "heading"},
+        {"text": "The second invented account calls involuntary capture by a loud sound attention.", "kind": "paragraph"},
+        {"text": "It does not require voluntary control or the same intended outcome.", "kind": "paragraph"}
+      ]
+    }
+  ],
+  "figures": []
+}

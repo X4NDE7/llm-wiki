@@ -1,4 +1,4 @@
-# Spec: /wiki ingest — Source Processing Pipeline
+# Spec: $wiki ingest — Source Processing Pipeline
 
 ## Description
 
@@ -96,6 +96,36 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
 
 ### Cross-Cutting
 
+### Jev-assisted input stages (Codex)
+
+- REQ-070: For `ingest.mode: jev`, Codex SHALL preserve source title, edition, URI,
+  page/line locations and available coordinates before structural recovery. Explicit
+  layout boundaries SHALL take precedence over semantic joining. Original spans
+  SHALL remain available independently of reconstructed reading text.
+- REQ-071: Codex SHALL perform open-ended section reading before proposing versioned
+  semantic questions. Existing dimensions MUST NOT exclude unfamiliar source ideas.
+- REQ-072: The helper SHALL persist exact question definitions, model, distributions,
+  request fingerprints, source revision and unanswered decisions. Independent
+  questions MAY be batched; dependent stages SHALL run after their inputs exist.
+- REQ-073: Vertical and horizontal reading tasks SHALL assemble source-linked
+  packets containing definitions, mechanisms, prerequisites, boundaries, supporting
+  evidence, conflicts, examples, figure references and uncertain candidates.
+- REQ-074: Exact-span selection SHALL use a separate answer-exists check. A relative
+  Choice winner MUST NOT imply that an answer exists. Absence applies to the evaluated
+  shortlist, not to the whole book. Omitted candidates SHALL be recorded.
+- REQ-075: Concept alignment SHALL preserve independent dimensions and remain a
+  candidate relation; it MUST NOT merge pages. Facet navigation SHALL retain multiple
+  paths with heuristic scores rather than assert a unique taxonomy or truth probability.
+- REQ-076: Without enabled live mode and an environment API key, Codex SHALL record
+  pending Jev judgments. It MUST NOT fabricate successful inference. API failures,
+  malformed responses and oversized evidence SHALL remain unresolved.
+- REQ-077: Codex SHALL inspect relevant figures separately, reconcile evidence in
+  context, attribute claims, and preserve contradictions. Jev confidence MUST NOT
+  substitute for verification or automatically determine article confidence.
+- REQ-078: Software tests SHALL be distinguished from held-out book evaluation.
+  Source and run artifacts SHALL be kept in the configured local artifact directory;
+  they SHALL NOT be committed with the public toolkit by default.
+
 - REQ-060: The system MUST NOT modify any non-wiki pages (existing Logseq journals,
   personal notes, other vault content).
 - REQ-061: The system SHALL use ISO 8601 date format (YYYY-MM-DD) for all date
@@ -115,7 +145,7 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
 GIVEN llm-wiki.yml is configured with tool: logseq and wiki_path: /tmp/test-wiki
 AND the wiki has a Schema page and a Wiki/Tech hub page
 AND no page exists for "Redis"
-WHEN the user runs /wiki ingest "https://redis.io/docs/about/"
+WHEN the user runs $wiki ingest "https://redis.io/docs/about/"
 THEN the system SHALL create a new page Wiki___Tech___Redis.md
 AND the page SHALL have properties: type:: entity, entity-type:: technology,
     created:: [today], updated:: [today], status:: active, source:: ingest
@@ -131,7 +161,7 @@ AND the report SHALL show: 1 page created, 1 hub updated, N cross-refs added
 ```
 GIVEN a page Wiki___Tech___Strapi.md exists with content "Headless CMS for Node.js"
 AND the page has updated:: 2026-03-01
-WHEN the user runs /wiki ingest "Strapi 5 uses documentId for PUT, not numeric id"
+WHEN the user runs $wiki ingest "Strapi 5 uses documentId for PUT, not numeric id"
 THEN the system SHALL append a new block to the existing page
 AND the original content "Headless CMS for Node.js" SHALL still be present unchanged
 AND updated:: SHALL be changed to [today]
@@ -232,6 +262,12 @@ AND the report SHALL note: "Namespace depth limit (3) reached, content merged
 ---
 
 ## Acceptance Criteria
+
+- [ ] Offline preparation/annotation/packet assembly preserve spans and pending decisions
+- [ ] No-answer selection, conflicting accounts and unknown candidates survive retrieval
+- [ ] Changing source or question definitions invalidates old artifact identities
+- [ ] Live calls enforce primitive shapes, request bounds, and explicit unknown states
+- [ ] Codex discovers the installed wiki skill and follows the source-evidence workflow
 
 - [ ] All 5 phases execute in order (Analysis, Scan, Operations, Quality Gate, Report)
 - [ ] URL, file path, and inline text sources all work

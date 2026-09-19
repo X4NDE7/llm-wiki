@@ -1,0 +1,11 @@
+{
+  "version": "attention-demo-v1",
+  "questions": {
+    "operation": {"type": "noul", "instructions": "Does passage describe an operation performed, rather than only an outcome?"},
+    "voluntary_control": {"type": "noul", "instructions": "Does passage explicitly require voluntary control for the operation it describes?"},
+    "prerequisite": {"type": "noul", "instructions": "Does passage state a necessary prerequisite for the described operation?"},
+    "reversible": {"type": "noul", "instructions": "Does passage explicitly describe a process that can be reversed?"},
+    "experience_vs_behavior": {"type": "noul", "instructions": "Does passage explicitly distinguish subjective experience from measured behavior or performance?"},
+    "scope_qualification": {"type": "noul", "instructions": "Does passage qualify the scope or conditions of its mechanism or account?"}
+  }
+}

@@ -17,7 +17,7 @@ that provides a structured knowledge management system for LLM assistants.
 - **Tool-agnostic:** Every feature MUST work in both Logseq and Obsidian modes
 - **Zero dependencies:** Only bash, python3, and git. No npm, no pip, no Docker
 - **Append-only wiki:** Never overwrite existing content blocks in wiki pages
-- **L1/L2 separation:** Credentials in L1 only. Wiki (L2) is git-tracked
+- **L1/L2 separation:** Non-secret rules/references in L1; actual credentials in environment/secret manager. Wiki (L2) is git-tracked
 - **JIT retrieval:** Max 3 wiki pages loaded at once
 
 ## Format Rules
@@ -36,7 +36,7 @@ that provides a structured knowledge management system for LLM assistants.
 
 ## Testing
 
-- No test framework (zero-dependency constraint)
+- Standard-library unittest is allowed; no external test framework dependencies
 - Manual verification via setup.sh with test directories
 - BDD scenarios from specs serve as manual test scripts
 - Each scenario describes: precondition, action, expected result
@@ -46,7 +46,7 @@ that provides a structured knowledge management system for LLM assistants.
 
 | File | Purpose |
 |------|---------|
-| `wiki.md` | /wiki skill definition (the prompt Claude Code executes) |
+| `wiki.md` | $wiki skill definition (the prompt Codex executes) |
 | `setup.sh` | Interactive installer |
 | `config.example.yml` | Configuration template |
 | `docs/` | Architecture docs, schema reference |

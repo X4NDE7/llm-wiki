@@ -1,0 +1,13 @@
+{
+  "mechanism": [
+    {"id": "selection", "description": "Selecting a target for processing", "children": [
+      {"id": "voluntary", "description": "Deliberate target selection"},
+      {"id": "involuntary", "description": "Involuntary capture by a stimulus"}
+    ]},
+    {"id": "monitoring", "description": "Monitoring ongoing activity without selecting a target"}
+  ],
+  "evidence_type": [
+    {"id": "subjective", "description": "Subjective experience or introspective reports"},
+    {"id": "behavioral", "description": "Measured behavior or performance"}
+  ]
+}

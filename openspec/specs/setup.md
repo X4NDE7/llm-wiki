@@ -4,8 +4,8 @@
 
 The setup script is the entry point for new users. It guides them through an
 interactive 11-step process to configure their wiki, create initial pages (Schema,
-Dashboard, Hub pages), generate the config file, and optionally install the /wiki
-skill for Claude Code. It requires only bash, python3, and git.
+Dashboard, Hub pages), generate the config file, and optionally install the $wiki
+skill for Codex. It requires only bash, python3, and git.
 
 ---
 
@@ -14,7 +14,8 @@ skill for Claude Code. It requires only bash, python3, and git.
 ### Prerequisites
 
 - REQ-700: The system MUST require bash (any version supporting `read -p`).
-- REQ-701: The system MUST require python3. If python3 is not available, the
+- REQ-701: The system MUST require Python 3 (python3, or python when it is version 3).
+  If neither executable provides Python 3, the
   system SHALL display an error and exit.
 - REQ-702: The system MUST require git for the optional git init step.
   If git is not available, git-related steps SHALL be skipped with a warning.
@@ -56,12 +57,12 @@ skill for Claude Code. It requires only bash, python3, and git.
 
 ### Step 5: Memory Path
 
-- REQ-750: The system SHALL prompt for the Claude Code memory directory path.
+- REQ-750: The system SHALL prompt for the Codex memory directory path.
 - REQ-751: The user MAY skip this step. If skipped, `memory_path` is empty
   in the generated config.
 - REQ-752: The system SHALL expand `~` to `$HOME` in the provided path.
 - REQ-753: The system does NOT validate that the memory path exists (it may
-  be created later by Claude Code).
+  be created later by Codex).
 
 ### Step 6: Git Init
 
@@ -110,15 +111,16 @@ skill for Claude Code. It requires only bash, python3, and git.
 
 ### Step 10: Skill Installation
 
-- REQ-800: The system SHALL ask if the user wants to install the /wiki skill
-  for Claude Code.
+- REQ-800: The system SHALL ask if the user wants to install the $wiki skill
+  for Codex.
 - REQ-801: The user MAY enter a project path or "skip" to decline.
-- REQ-802: If installing: copy `wiki.md` to `$project/.claude/commands/wiki.md`,
-  creating the directory if needed.
-- REQ-803: The system SHALL patch the `<CONFIG_PATH>` placeholder in the
-  copied skill file with the actual config file path using `sed`.
-- REQ-804: The sed command MUST be platform-aware: macOS uses `sed -i ''`,
-  Linux uses `sed -i`.
+- REQ-802: If installing: assemble `skills/wiki/SKILL.md`, workflow references,
+  examples and the Python helper at `$project/.agents/skills/wiki/`.
+- REQ-803: The system SHALL write the resolved config path to the installed
+  `config-path.txt` and use relative links inside the self-contained skill bundle.
+- REQ-804: The installer SHALL preserve existing project `AGENTS.md` content and
+  append a wiki-skill locator once. Python argument passing SHALL preserve paths
+  containing spaces or quotes without executing their contents.
 
 ### Step 11: Initial Git Commit
 
@@ -149,7 +151,7 @@ WHEN the user runs ./setup.sh and:
     - Enters "~/Documents/TestWiki" (does not exist)
     - Confirms "y" to create directory
     - Presses Enter for default namespaces
-    - Enters "~/.claude/projects/test/memory/" for memory path
+    - Enters "~/.codex/wiki-memory/test/" for memory path
     - Confirms "y" for git init
     - Enters "~/myproject" for skill installation
 THEN the system SHALL:
@@ -157,7 +159,7 @@ THEN the system SHALL:
     - Create 9 pages: Schema, Dashboard, 7 hub pages (one per default namespace)
     - Create llm-wiki.yml with all settings
     - Initialize git with .gitignore
-    - Copy wiki.md to ~/myproject/.claude/commands/wiki.md with patched config path
+    - Install the self-contained Codex skill with a config-path.txt locator
     - Create initial git commit
     - Display summary with next steps
 ```
@@ -268,7 +270,7 @@ AND the system SHOULD display: "Wiki___Schema.md already exists, skipping"
 
 ## Acceptance Criteria
 
-- [ ] Only requires bash, python3, git (no package managers, no libraries)
+- [ ] Only requires bash, Python 3, git (no package managers, no libraries)
 - [ ] Tool selection (1/2) determines all downstream behavior
 - [ ] Tilde expansion works in all path inputs
 - [ ] Missing directories created with user confirmation
@@ -277,7 +279,7 @@ AND the system SHOULD display: "Wiki___Schema.md already exists, skipping"
 - [ ] Logseq: flat files with triple-underscore naming
 - [ ] Obsidian: directory hierarchy with _index.md hub files
 - [ ] Config file generated with all required keys
-- [ ] Skill installation optional, sed platform-aware
+- [ ] Skill installation optional, self-contained and discoverable by Codex
 - [ ] Git init optional, tool-specific .gitignore
 - [ ] Existing pages not silently overwritten
 - [ ] Clear error messages for all failure modes
