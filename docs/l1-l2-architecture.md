@@ -159,6 +159,25 @@ The L1/L2 boundary is not static. As your wiki grows, some knowledge migrates:
 - **Merge**: Two L1 files cover related gotchas. Combine them into one to keep L1 lean.
 - **Archive**: A project completes. Its L1 gotchas become L2 historical notes.
 
-The `/wiki lint` command helps with this evolution by flagging anomalies: L1 files that have not been referenced in 90 days, L2 pages that get queried in every session (suggesting they should be L1), and duplicates that need resolution.
+`/wiki lint` flags L1/L2 duplicates that need resolution. Promotion from L2 to L1 is still a manual decision. Demotion out of L1 has its own mechanism, described next.
+
+## Keeping L1 Honest: Claim Class + Verification
+
+Access-based eviction (`/wiki prune`) only covers L2. Every L1 file loads every session, so "last used" carries no signal: a stale L1 rule never looks cold. It shows up as the agent confidently acting on an outdated assumption.
+
+So L1 staleness is tied to *what kind of claim* a rule makes, not to how often it is read. Each L1 file can carry one frontmatter key:
+
+- `asserts-current-behavior: true` — a falsifiable claim about the current state of a system: a path, command, flag, version, port, or tool quirk. "PM2 reload does not work with npm start." These can go stale without anyone touching the rule.
+- `asserts-current-behavior: false` — a decision, preference, identity fact, or rationale. "No AI attribution in commits." These never go stale.
+
+Behavior claims also carry `verified: <date>`. A claim is **due** when it was never verified or the date is older than `l1_verify_days` (default 90). How many files that is depends on how you use L1. A lean L1 of decisions and preferences has few; an L1 that accumulated gotchas and project state has many. In a 15-file pilot on a long-lived L1, 12 were behavior claims, and one was project state that belonged in L2 all along.
+
+The loop:
+
+1. **`/wiki lint`** (Rule 12) reports due claims and the number of unclassified files. It never writes to L1 and never prints L1 file bodies — L1 may hold credentials.
+2. **`/wiki prune --l1`** classifies unclassified files in batches (it proposes, you confirm), then checks due claims against **read-only, local evidence**: does the path exist, does `--help` still list the flag, does the dependency manifest still pin that version. Each claim inside a rule gets its own verdict — supports, contradicts, or inconclusive (e.g. pricing or third-party behavior that cannot be checked locally) — with its basis: a read-only command, the implementing source code, or a file check. Rules usually bundle several claims, so partial verdicts are normal and marked as such.
+3. **You decide per rule:** re-verify (stamps `verified`; on a contradiction only together with a corrected rule text), demote to L2 (the rule becomes a history block on the matching wiki page, then the L1 file and its index line are removed), or delete. A correction reaches everywhere the claim is loaded from: body, `description`, and the index line. Before a file is removed, references to it from other L1 files are rewritten or listed. L1 is not git-tracked, so nothing is written without confirmation, and you see what carries over to L2 and what is dropped before removal. Credential rules are never demoted to L2.
+
+**What this does not do (yet):** warn at the moment a due rule is about to justify an action. Claude Code loads L1, not llm-wiki, so there is no hook to enforce such a gate. A due rule is caught on the next `lint` / `prune --l1` run, not mid-session. A planning-vs-action gate — soft note when a stale rule informs planning, loud warning when it justifies a write — is on the roadmap.
 
 The goal is a lean L1 and a rich L2. Keep the fast cache small and hot. Let the wiki grow without bounds.

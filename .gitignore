@@ -4,3 +4,9 @@ __pycache__/
 .env
 .env.*
 graphify-out/
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
