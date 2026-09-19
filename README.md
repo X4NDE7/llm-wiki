@@ -137,6 +137,10 @@ For the full deep-dive, see [docs/l1-l2-architecture.md](docs/l1-l2-architecture
 
 ### Ingest Flow
 
+For book-scale ingestion with source-linked structure recovery, semantic dimensions,
+and vertical/horizontal evidence assembly, see the
+[Jev ingestion design](docs/jev-ingestion.md).
+
 Ingest is the core operation. When you run `/wiki ingest "deployed v2.0 to production"`, here is what happens:
 
 ```mermaid
